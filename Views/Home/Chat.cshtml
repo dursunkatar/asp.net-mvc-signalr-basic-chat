@@ -1,0 +1,69 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+    <title>SignalR Chat</title>
+    <style>
+        .mesaj {
+            border: 1px solid silver;
+            height: 250px;
+            overflow: auto;
+        }
+    </style>
+</head>
+<body>
+    <div style="border:1px solid silver;width:500px;margin: 40px auto;padding: 10px;">
+        <div class="mesaj">
+            <ul id="discussion" class="list-group"></ul>
+        </div>
+        <br />
+        <input class="form-control form-control-sm" type="text" id="message" />
+        <br />
+        <input class="btn  btn-dark form-control form-control-sm" type="button" id="sendmessage" value="Gönder" />
+        <input type="hidden" id="displayname" />
+    </div>
+    <script src="~/Scripts/jquery-3.0.0.min.js"></script>
+    <script src="~/Scripts/bootstrap.min.js"></script>
+    <script src="~/Scripts/jquery.signalR-2.4.0.min.js"></script>
+    <script src="~/signalr/hubs"></script>
+    <script>
+        var chat = $.connection.chatHub;
+        var messageUl = document.getElementById('discussion')
+        chat.client.addNewMessageToPage = function (name, message) {
+            messageUl.insertAdjacentHTML('afterbegin', `<li class="list-group-item"><strong>${htmlEncode(name)}:  </strong>${htmlEncode(message)}</li>`);
+        };
+
+        $('#displayname').val(prompt('Enter your name:', ''));
+        $('#message').focus();
+        $.connection.hub.start().done(function () {
+            $('#sendmessage').click(function () {
+                sendMessage()
+            });
+
+            $('#message').keyup(function (event) {
+                if (event.keyCode === 13)
+                    sendMessage()
+            })
+        });
+
+        function sendMessage() {
+            chat.server.send($('#displayname').val(), $('#message').val());
+            $('#message').val('').focus();
+        }
+
+        function htmlEncode(value) {
+            return $('<div />').text(value).html();
+        }
+
+    </script>
+</body>
+</html>
