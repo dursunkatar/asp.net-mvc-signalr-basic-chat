@@ -1,4 +1,4 @@
-﻿
+
 @{
     Layout = null;
 }
@@ -13,7 +13,7 @@
     <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
     <title>SignalR Chat</title>
     <style>
-        .mesaj {
+        #messageDiv {
             border: 1px solid silver;
             height: 250px;
             overflow: auto;
@@ -22,7 +22,7 @@
 </head>
 <body>
     <div style="border:1px solid silver;width:500px;margin: 40px auto;padding: 10px;">
-        <div class="mesaj">
+        <div id="messageDiv">
             <ul id="discussion" class="list-group"></ul>
         </div>
         <br />
@@ -37,9 +37,10 @@
     <script src="~/signalr/hubs"></script>
     <script>
         var chat = $.connection.chatHub;
-        var messageUl = document.getElementById('discussion')
+        var messageDiv = document.getElementById('messageDiv')
         chat.client.addNewMessageToPage = function (name, message) {
-            messageUl.insertAdjacentHTML('afterbegin', `<li class="list-group-item"><strong>${htmlEncode(name)}:  </strong>${htmlEncode(message)}</li>`);
+            $('#discussion').append(`<li class="list-group-item"><strong>${htmlEncode(name)}:  </strong>${htmlEncode(message)}</li>`)
+            messageDiv.scrollTop = messageDiv.scrollHeight
         };
 
         $('#displayname').val(prompt('Enter your name:', ''));
